@@ -51,14 +51,14 @@ class BERT():
                                              optimizer_type='adamw')
 
 
-    def fit(self, training, validation, epochs=100):
-        return self.model.fit(x=list(training[0]),
-                              y=list(training[1]),
-                              validation_data=validation,
+    def fit(self, training_text, training_label, epochs=100):
+        return self.model.fit(training_text,
+                              training_label,
+                              validation_split=0.25,
                               epochs=epochs)
 
-    def evaluate_model(self, test_set):
-        return self.model.evaluate(test_set)
+    def evaluate_model(self, test_text, test_label):
+        return self.model.evaluate(test_text, test_label)
 
     def get_config(self) -> Dict:
         pass 

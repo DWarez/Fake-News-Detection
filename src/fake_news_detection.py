@@ -25,16 +25,12 @@ def initialize_models(models_config):
     return BERT() 
 
 def fake_news_detection(command_line_args):
-    train_data = pd.read_csv(command_line_args.training_path)[["text", "label"]]
-    train_data, validation_data = train_test_split(train_data, test_size = 0.25)
-    test_data = pd.read_csv(command_line_args.test_path)[["text", "label"]]
+    train_data = pd.read_csv(command_line_args.training_path)[["text", "label"]][:100]
+    #test_data = pd.read_csv(command_line_args.test_path)[["text", "label"]][:500]
 
-    
     models = initialize_models(command_line_args.models)
-    models.fit((train_data["text"], train_data["label"]),
-               validation_data,
-                20)
-    print(models.evaluate(validation_data))
+    models.fit(train_data["text"], train_data["label"], 20)
+    #print(models.evaluate_model(test_data["text"], test_data["label"]))
 
 if __name__== "__main__":
     args = command_line_arguments()
