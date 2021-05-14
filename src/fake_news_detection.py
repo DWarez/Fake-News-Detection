@@ -31,7 +31,9 @@ def command_line_arguments():
 def initialize_models(models_config):
     """
         Initialize models and returns list of model objects based on 
-        JSON file with models and their parameters 
+        JSON file with models and their parameters
+        It pass to each model the JSON object of each model and the model 
+        recognize and process the JSON object with parameters of the model  
     """
     models = []
     with open(models_config) as models_file:
@@ -42,7 +44,10 @@ def initialize_models(models_config):
     return models
 
 def fake_news_detection(command_line_args):
-    train_data = pd.read_csv(command_line_args.training_path)[["text", "label"]][:1500]
+    """
+        Perform Fake News detection using         
+    """
+    train_data = pd.read_csv(command_line_args.training_path)[["text", "label"]]
     test_data = pd.read_csv(command_line_args.test_path)[["text", "label"]][:500]
 
     models = initialize_models(command_line_args.models)
