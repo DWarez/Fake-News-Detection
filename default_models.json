@@ -2,7 +2,7 @@
     "BERT" : {
         "loss": "binary_crossentropy",
         "metrics": "binary_accuracy",
-        "epochs": 1,
+        "epochs": 20,
         "epochs_tuning": 50,
         "initial_lr": 3e-5,
         "prob_dropout": 0.15,

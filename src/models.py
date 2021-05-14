@@ -6,7 +6,6 @@ import tensorflow as tf
 import tensorflow_hub as hub
 import tensorflow_text 
 from official.nlp import optimization  # to create AdamW optimizer
-
 import matplotlib.pyplot as plt
 
 TFHUB_HANDLE_ENCODER = 'https://tfhub.dev/tensorflow/small_bert/bert_en_uncased_L-2_H-128_A-2/1'
@@ -25,6 +24,7 @@ class BERT():
         self.model.compile(optimizer=self.optimizer,
                            loss=self.loss,
                            metrics=self.metrics)
+        self.history = []
 
     def build_model(self, prob_dropout, bert_preprocess, bert_encoder):
         text_input = tf.keras.layers.Input(shape=(), dtype=tf.string, name='text')
@@ -51,14 +51,47 @@ class BERT():
 
 
     def fit(self, training_text, training_label):
-        return self.model.fit(training_text,
+        self.history = self.model.fit(training_text,
                               training_label,
                               validation_split=self.validation_split,
                               epochs=self.epochs)
+        return self.history
 
     def evaluate_model(self, test_text, test_label):
         return self.model.evaluate(test_text, test_label)
 
+    def plot_loss(self):
+        history_dict = self.history.history
+
+        loss = history_dict['loss']
+        val_loss = history_dict['val_loss']
+
+        epochs = range(1, self.epochs + 1)
+
+        # "bo" is for "blue dot"
+        plt.plot(epochs, loss, 'r', label='Training loss')  
+        # b is for "solid blue line"
+        plt.plot(epochs, val_loss, 'b', label='Validation loss')
+        plt.title('Training and validation loss')
+        # plt.xlabel('Epochs')
+        plt.ylabel('Loss')
+        plt.legend()
+        plt.show()
+
+    def plot_accuracy(self):
+        history_dict = self.history.history 
+        acc = history_dict['binary_accuracy']
+        val_acc = history_dict['val_binary_accuracy']
+        epochs = range(1, self.epochs + 1)
+        
+        plt.plot(epochs, acc, 'r', label='Training acc')
+        plt.plot(epochs, val_acc, 'b', label='Validation acc')
+        plt.title('Training and validation accuracy')
+        plt.xlabel('Epochs')
+        plt.ylabel('Accuracy')
+        plt.legend(loc='lower right')
+        plt.show() 
+        
 loss_function = {
     'binary_crossentropy': tf.keras.losses.BinaryCrossentropy(),
 }
