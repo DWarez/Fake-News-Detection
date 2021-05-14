@@ -26,20 +26,22 @@ def initialize_models(models_config):
     with open(models_config) as models_file:
         data = json.load(models_file)
         if data["BERT"]:
-            models.append(initialize_bert(data["BERT"]))
+            models.append(BERT(data["BERT"]))
     return models
 
-def initialize_bert(bert_config):
-    loss = loss_function[bert_config["loss"]]
-    metrics = metric_function[bert_config["metrics"]]
-    epochs = bert_config["epochs"]
-    bert_encoder = bert_config["encoder_hub"]
-    bert_preprocessing = bert_config["preprocessing_hub"]
-    prob_dropout = bert_config["prob_dropout"]
-    return BERT(loss, metrics, epochs, bert_encoder, bert_preprocessing, prob_dropout)
+#def initialize_bert(bert_config):
+#    params = {}
+#    params["loss"] = loss_function[bert_config["loss"]]
+#    params["metrics"] = metric_function[bert_config["metrics"]]
+#    params["epochs"] = bert_config["epochs"]
+#    params["epochs_tuning"] = bert_config["epochs_tuning"]
+#    params["bert_encoder"] = bert_config["encoder_hub"]
+#    params["bert_preprocess"] = bert_config["preprocessing_hub"]
+#    params[""] = bert_config["prob_dropout"]
+#    return BERT(loss, metrics, epochs, bert_encoder, bert_preprocessing, prob_dropout)
 
 def fake_news_detection(command_line_args):
-    train_data = pd.read_csv(command_line_args.training_path)[["text", "label"]][:1000]
+    train_data = pd.read_csv(command_line_args.training_path)[["text", "label"]]
     test_data = pd.read_csv(command_line_args.test_path)[["text", "label"]][:500]
 
     models = initialize_models(command_line_args.models)
