@@ -12,6 +12,9 @@ TFHUB_HANDLE_ENCODER = 'https://tfhub.dev/tensorflow/small_bert/bert_en_uncased_
 TFHUB_HANDLE_PREPROCESS = 'https://tfhub.dev/tensorflow/bert_en_uncased_preprocess/3'
 
 class BERT():
+    """
+        Model using BERT preprocessing and Bert encoding, with dropout and a dense layer for classification.
+    """
     def __init__(self, params):
         self.model = self.build_model(params["prob_dropout"], params["preprocessing_hub"], 
                                       params["encoder_hub"])
@@ -26,7 +29,18 @@ class BERT():
                            metrics=self.metrics)
         self.history = []
 
+
     def build_model(self, prob_dropout, bert_preprocess, bert_encoder):
+        """Method for creating the model.
+
+        Args:
+            prob_dropout (float): Probability of Dropout
+            bert_preprocess (str): Handler for BERT preprocessing model on TFHub
+            bert_encoder (str): Handler for BERT encoding model on TFHub
+
+        Returns:
+            tf.keras.Model: Architecture of our BERT-based model
+        """
         text_input = tf.keras.layers.Input(shape=(), dtype=tf.string, name='text')
         preprocessing_layer = hub.KerasLayer(bert_preprocess, name='preprocessing')
         encoder_inputs = preprocessing_layer(text_input)
@@ -37,7 +51,18 @@ class BERT():
         net = tf.keras.layers.Dense(1, activation=None, name='classifier')(net)
         return tf.keras.Model(text_input, net)
 
+
     def build_optimizer(self, epochs_tuning, initial_learning_rate, optimizer):
+        """Method for building the optimizer used for the BERT-based model
+
+        Args:
+            epochs_tuning (int): Number of epochs of training
+            initial_learning_rate (float): Starting learning rate
+            optimizer (str): Optimizer type used
+
+        Returns:
+            tf.keras.optimizer: Optimizer of the BERT-based model
+        """
         epochs = epochs_tuning
         #steps_per_epoch = tf.data.experimental.cardinality(train_ds).numpy()
         num_train_steps = 10 * epochs
@@ -51,16 +76,38 @@ class BERT():
 
 
     def fit(self, training_text, training_label):
+        """Method for fitting the model
+
+        Args:
+            training_text (): Patterns for training
+            training_label (): Labels of training patterns
+
+        Returns:
+            tf.keras.callbacks.History: History of the training
+        """
         self.history = self.model.fit(training_text,
                               training_label,
                               validation_split=self.validation_split,
                               epochs=self.epochs)
         return self.history
 
+
     def evaluate_model(self, test_text, test_label):
+        """Evaluation of the model
+
+        Args:
+            test_text (): Patterns for testing
+            test_label (): Labels of testing patterns
+
+        Returns:
+            float: Test loss
+        """
         return self.model.evaluate(test_text, test_label)
 
+
     def plot_loss(self):
+        """Method to plot the loss
+        """
         history_dict = self.history.history
 
         loss = history_dict['loss']
@@ -78,7 +125,10 @@ class BERT():
         plt.legend()
         plt.show()
 
+
     def plot_accuracy(self):
+        """Method to plot the accuracy
+        """
         history_dict = self.history.history 
         acc = history_dict['binary_accuracy']
         val_acc = history_dict['val_binary_accuracy']
@@ -91,11 +141,13 @@ class BERT():
         plt.ylabel('Accuracy')
         plt.legend(loc='lower right')
         plt.show() 
-        
+
+# Loss Dictionary        
 loss_function = {
     'binary_crossentropy': tf.keras.losses.BinaryCrossentropy(),
 }
 
+# Metric Dictionary
 metric_function = {
     'binary_accuracy': tf.metrics.BinaryAccuracy(),
 }
