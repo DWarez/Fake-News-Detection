@@ -8,16 +8,16 @@ import tensorflow_text
 from official.nlp import optimization  # to create AdamW optimizer
 import matplotlib.pyplot as plt
 
-TFHUB_HANDLE_ENCODER = 'https://tfhub.dev/tensorflow/small_bert/bert_en_uncased_L-2_H-128_A-2/1'
-TFHUB_HANDLE_PREPROCESS = 'https://tfhub.dev/tensorflow/bert_en_uncased_preprocess/3'
+TFHUB_HANDLE_BERT_ENCODER = 'https://tfhub.dev/tensorflow/small_bert/bert_en_uncased_L-2_H-128_A-2/1'
+TFHUB_HANDLE_BERT_PREPROCESS = 'https://tfhub.dev/tensorflow/bert_en_uncased_preprocess/3'
 
 class BERT():
     """
         Model using BERT preprocessing and Bert encoding, with dropout and a dense layer for classification.
     """
     def __init__(self, params):
-        self.model = self.build_model(params["prob_dropout"], params["preprocessing_hub"], 
-                                      params["encoder_hub"])
+        self.model = self.build_model(params["prob_dropout"], params["BERT_preprocessing_hub"], 
+                                      params["BERT_encoder_hub"])
         self.loss = params["loss"]
         self.metrics = params["metrics"]
         self.optimizer = self.build_optimizer(params["epochs_tuning"], params["initial_lr"],
