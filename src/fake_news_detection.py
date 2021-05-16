@@ -4,7 +4,8 @@
 import argparse
 import json
 import pandas as pd
-from models import BERT, loss_function, metric_function
+from models import ALBERT, BERT, loss_function, metric_function
+
 
 def command_line_arguments():
     """
@@ -28,6 +29,7 @@ def command_line_arguments():
     #parser.add_argument('-parameters')
     return parser.parse_args()
 
+
 def initialize_models(models_config):
     """
         Initialize models and returns list of model objects based on 
@@ -40,21 +42,25 @@ def initialize_models(models_config):
         data = json.load(models_file)
         if data["BERT"]:
             models.append(BERT(data["BERT"]))
+        # if data["ALBERT"]:
+        #     models.append(ALBERT(data["ALBERT"]))
 
     return models
+
 
 def fake_news_detection(command_line_args):
     """
         Perform Fake News detection using         
     """
     train_data = pd.read_csv(command_line_args.training_path)[["text", "label"]]
-    test_data = pd.read_csv(command_line_args.test_path)[["text", "label"]][:500]
+    test_data = pd.read_csv(command_line_args.test_path)[["text", "label"]]
 
     models = initialize_models(command_line_args.models)
     models[0].fit(train_data["text"], train_data["label"])
     models[0].plot_loss()
     models[0].plot_accuracy()
     print(models[0].evaluate_model(test_data["text"], test_data["label"]))
+
 
 if __name__ =="__main__":
     args = command_line_arguments()
