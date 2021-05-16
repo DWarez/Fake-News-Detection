@@ -166,6 +166,30 @@ class BERT():
         plt.show() 
 
 
+class FF(BERT):
+    def __init__(self, params):
+        self.model = self.build_model(params["prob_dropout"], params["encoder_hub"])
+        self.loss = params["loss"]
+        self.metrics = params["metrics"]
+        self.optimizer = self.build_optimizer(params["epochs_tuning"], params["initial_lr"],
+                                              params["optimizer_type"])
+        self.epochs = params["epochs"]
+        self.validation_split = params["validation_split"]
+        self.model.compile(optimizer=self.optimizer,
+                           loss=self.loss,
+                           metrics=self.metrics)
+        self.history = []
+
+    def build_model(self, prob_dropout, nnlm):
+        text_input = tf.keras.layers.Input(shape=(), dtype=tf.string, name='text')
+        nnlm_encoder = hub.KerasLayer(nnlm, name='encoder')
+        inputs = nnlm_encoder(text_input)
+        net = inputs
+        net = tf.keras.layers.Dropout(prob_dropout)(net)
+        net = tf.keras.layers.Dense(100, activation="tanh", name='hidden1')(net)
+        net = tf.keras.layers.Dense(1, activation="tanh", name='classifier')(net)
+        return tf.keras.Model(text_input, net)
+
 # Loss Dictionary        
 loss_function = {
     'binary_crossentropy': tf.keras.losses.BinaryCrossentropy(),

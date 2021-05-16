@@ -4,7 +4,7 @@
 import argparse
 import json
 import pandas as pd
-from models import BERT, loss_function, metric_function
+from models import BERT, FF, loss_function, metric_function
 
 
 def command_line_arguments():
@@ -40,8 +40,8 @@ def initialize_models(models_config):
     models = []
     with open(models_config) as models_file:
         data = json.load(models_file)
-        if data["ELECTRA"]:
-            models.append(BERT(data["ELECTRA"]))
+        if data["NNLM"]:
+            models.append(FF(data["NNLM"]))
 
     return models
 
