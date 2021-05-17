@@ -40,9 +40,10 @@ def initialize_models(models_config):
     models = []
     with open(models_config) as models_file:
         data = json.load(models_file)
-        if data["NNLM"]:
-            models.append(FF(data["NNLM"]))
-
+        #if data["NNLM"]:
+        #    models.append(FF(data["NNLM"]))
+        if data["BERT"]:
+            models.append(BERT(data["BERT"]))
     return models
 
 
@@ -52,14 +53,20 @@ def fake_news_detection(command_line_args):
     """
     train_data = pd.read_csv(command_line_args.training_path)[["text", "label"]]
     test_data = pd.read_csv(command_line_args.test_path)[["text", "label"]]
-
+    train_data["label"] = [label_value[label] for label in train_data["label"]]
+    test_data["label"] = [label_value[label] for label in test_data["label"]]
     models = initialize_models(command_line_args.models)
     models[0].fit(train_data["text"], train_data["label"])
     models[0].plot_loss()
     models[0].plot_accuracy()
     print(models[0].evaluate_model(test_data["text"], test_data["label"]))
 
-
+label_value = {
+    'FALSE': 0,
+    'partially false': 1,
+    'other': 2, 
+    'TRUE': 3,
+}
 if __name__ =="__main__":
     args = command_line_arguments()
     fake_news_detection(args)

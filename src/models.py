@@ -54,7 +54,7 @@ class BERT():
         outputs = encoder(encoder_inputs)
         net = outputs['pooled_output']
         net = tf.keras.layers.Dropout(prob_dropout)(net)
-        net = tf.keras.layers.Dense(1, activation="tanh", name='classifier')(net)
+        net = tf.keras.layers.Softmax(name='softmax_classifier')(net)
         return tf.keras.Model(text_input, net)
 
 
