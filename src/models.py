@@ -180,9 +180,10 @@ class FF(BERT):
                            metrics=self.metrics)
         self.history = []
 
+
     def build_model(self, prob_dropout, nnlm):
         text_input = tf.keras.layers.Input(shape=(), dtype=tf.string, name='text')
-        nnlm_encoder = hub.KerasLayer(nnlm, name='encoder')
+        nnlm_encoder = hub.KerasLayer(nnlm, trainable=True, name='encoder')
         inputs = nnlm_encoder(text_input)
         net = inputs
         net = tf.keras.layers.Dropout(prob_dropout)(net)

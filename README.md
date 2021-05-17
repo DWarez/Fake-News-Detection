@@ -2,8 +2,8 @@
 Repository for the HLT project @ University of  Pisa a.y. 2020/21
 
 
-## Dataset
-The dataset used is available [at this Kaggle link](https://www.kaggle.com/clmentbisaillon/fake-and-real-news-dataset?select=Fake.csv).
+## Dataset and Task
+All the informations about the tasks can be found on the [official CLEF2021--CheckThat-Lab Gitlab repository](https://gitlab.com/checkthat_lab/clef2021-checkthat-lab).
 
 ## Contributors
 [Marco Natali](m.natali10@studenti.unipi.it)
