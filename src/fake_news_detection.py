@@ -16,6 +16,7 @@ def command_line_arguments():
         -Name of Training dataset path
         -Name of Test dataset path 
         -Path to JSON file with models and their parameters to detect Fake news 
+        -Path to JSON file with Grid search choices 
     """
     parser = argparse.ArgumentParser(description='Fake News detection using some ML models')
     parser.add_argument('-training', metavar='TRAIN_PATH', type=str,
@@ -28,10 +29,12 @@ def command_line_arguments():
                         dest='validation_path')
     parser.add_argument('-test', default='../data/test_set_covid.csv',
                         dest='test_path', help='Path of Test dataset (Default data/test_set_covid.csv)')
-    parser.add_argument('-models', type=str, default='../hyperparameters.json',
+    parser.add_argument('-models', type=str, default='../default_models.json',
                         help='Path to JSON file with models and their parameters to detect Fake News',
                         dest='models')
-    #parser.add_argument('-parameters')
+    parser.add_argument('-grid_search_models', type=str, default='../hyperparameters.json',
+                        help='Path to JSON file with Grid Search choices for model tuning',
+                        dest='grid_search')
     return parser.parse_args()
 
 
@@ -68,9 +71,8 @@ def fake_news_detection(command_line_args):
     #models[0].plot_loss()
     #models[0].plot_accuracy()
     #print(models[0].evaluate_model(test_data["tweet"], test_data["label"]))
-    with open(command_line_args.models) as models_file:
+    with open(command_line_args.grid_search) as models_file:
         data = json.load(models_file)
-        print(data)
         perform_grid_tuning(data, train_data["tweet"], train_data["label"],
                         (validation_data["tweet"], validation_data["label"]))
 label_value = {

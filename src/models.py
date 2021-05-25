@@ -209,12 +209,12 @@ class TuningBert(HyperModel):
 
         net = tf.keras.layers.Dropout(hp.Float('dropout', self.params["dropout"]["min_value"],
                                            self.params["dropout"]["max_value"],
-                                           self.params["dropout"]["step"]))
-        net = tf.keras.layers.Dense(32, activation='relu')
+                                           self.params["dropout"]["step"]))(net)
+        net = tf.keras.layers.Dense(32, activation='relu')(net)
         dense_unit = self.params["dense_units"]
         net = tf.keras.layers.Dense(hp.Int('dense_unit', dense_unit["min_value"],
-                                       dense_unit["max_value"], dense_unit["step"]))
-        net = tf.keras.layers.Dense(1, activation='sigmoid')
+                                       dense_unit["max_value"], dense_unit["step"]))(net)
+        net = tf.keras.layers.Dense(1, activation='sigmoid')(net)
         model = tf.keras.Model(text_input, net)
         model.compile(optimizer=tf.keras.optimizers.Adam(
             hp.Choice('learning_rate',
