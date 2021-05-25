@@ -4,7 +4,8 @@
 import argparse
 import json
 import pandas as pd
-from models import BERT, FF, loss_function, metric_function
+
+from models import BERT, FF, loss_function, metric_function, perform_grid_tuning
 
 
 def command_line_arguments():
@@ -27,7 +28,7 @@ def command_line_arguments():
                         dest='validation_path')
     parser.add_argument('-test', default='../data/test_set_covid.csv',
                         dest='test_path', help='Path of Test dataset (Default data/test_set_covid.csv)')
-    parser.add_argument('-models', type=str, default='../default_models.json',
+    parser.add_argument('-models', type=str, default='../hyperparameters.json',
                         help='Path to JSON file with models and their parameters to detect Fake News',
                         dest='models')
     #parser.add_argument('-parameters')
@@ -61,13 +62,17 @@ def fake_news_detection(command_line_args):
     train_data["label"] = [label_value[label] for label in train_data["label"]]
     validation_data["label"] = [label_value[label] for label in validation_data["label"]]
     test_data["label"] = [label_value[label] for label in test_data["label"]]
-    models = initialize_models(command_line_args.models)
-    models[0].fit(train_data["tweet"], train_data["label"],
-                  (validation_data["tweet"], validation_data["label"]))
-    models[0].plot_loss()
-    models[0].plot_accuracy()
-    print(models[0].evaluate_model(test_data["tweet"], test_data["label"]))
-
+    #models = initialize_models(command_line_args.models)
+    #models[0].fit(train_data["tweet"], train_data["label"],
+    #              (validation_data["tweet"], validation_data["label"]))
+    #models[0].plot_loss()
+    #models[0].plot_accuracy()
+    #print(models[0].evaluate_model(test_data["tweet"], test_data["label"]))
+    with open(command_line_args.models) as models_file:
+        data = json.load(models_file)
+        print(data)
+        perform_grid_tuning(data, train_data["tweet"], train_data["label"],
+                        (validation_data["tweet"], validation_data["label"]))
 label_value = {
     'fake': 0,
     'real': 1,

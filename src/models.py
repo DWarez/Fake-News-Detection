@@ -3,9 +3,12 @@
 """
 
 import tensorflow as tf
+from tensorflow import keras
 import tensorflow_hub as hub
 import tensorflow_addons as tfa
 import tensorflow_text 
+from kerastuner import HyperModel
+from kerastuner.tuners import RandomSearch
 from official.nlp import optimization  # to create AdamW optimizer
 import matplotlib.pyplot as plt
 
@@ -34,7 +37,6 @@ class BERT():
                            loss=self.loss,
                            metrics=self.metrics)
         self.history = []
-
 
     def build_model(self, prob_dropout, bert_preprocess, bert_encoder):
         """Method for creating the model.
@@ -193,6 +195,45 @@ class FF(BERT):
         net = tf.keras.layers.Dense(1, activation="tanh", name='classifier')(net)
         return tf.keras.Model(text_input, net)
 
+class TuningBert(HyperModel):
+    def __init__(self, params):
+        self.params = params 
+    
+    def build(self, hp):
+        text_input = tf.keras.layers.Input(shape=(), dtype=tf.string, name='text')
+        preprocessing_layer = hub.KerasLayer(hp.Fixed('preprocessing', self.params["preprocessing"]), name='preprocessing')
+        encoder_inputs = preprocessing_layer(text_input)
+        encoder = hub.KerasLayer(hp.Choice('encoder', self.params["encoder"]["values"]), name='BERT_encoder')
+        outputs = encoder(encoder_inputs)
+        net = outputs['pooled_output']
+
+        net = tf.keras.layers.Dropout(hp.Float('dropout', self.params["dropout"]["min_value"],
+                                           self.params["dropout"]["max_value"],
+                                           self.params["dropout"]["step"]))
+        net = tf.keras.layers.Dense(32, activation='relu')
+        dense_unit = self.params["dense_units"]
+        net = tf.keras.layers.Dense(hp.Int('dense_unit', dense_unit["min_value"],
+                                       dense_unit["max_value"], dense_unit["step"]))
+        net = tf.keras.layers.Dense(1, activation='sigmoid')
+        model = tf.keras.Model(text_input, net)
+        model.compile(optimizer=tf.keras.optimizers.Adam(
+            hp.Choice('learning_rate',
+                      self.params["learning_rate"]["values"])),
+        loss=loss_function[self.params["loss"]],
+        metrics=metric_function[self.params["metrics"]])
+        return model   
+
+def perform_grid_tuning(params, train_data, train_label, validation_data):
+    tuner = RandomSearch(
+        TuningBert(params),
+        objective='val_accuracy',
+        max_trials=5,
+        executions_per_trial=3,
+        directory='my_dir',
+        project_name='helloworld')
+    tuner.search(train_data, train_label,
+                 epochs=5,
+                 validation_data=validation_data)
 # Loss Dictionary        
 loss_function = {
     'binary_crossentropy': tf.keras.losses.BinaryCrossentropy(),
@@ -203,7 +244,6 @@ loss_function = {
 metric_function = {
     'precision': tf.metrics.Precision(),
     'recall': tf.metrics.Recall(),
-    'f1': tfa.metrics.F1Score(),
     'binary_accuracy': tf.metrics.BinaryAccuracy(name='accuracy'),
     'accuracy': tf.metrics.CategoricalAccuracy(name='accuracy'),
 }
