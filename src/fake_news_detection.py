@@ -18,10 +18,10 @@ def command_line_arguments():
     """
     parser = argparse.ArgumentParser(description='Fake News detection using some ML models')
     parser.add_argument('-training', metavar='TRAIN_PATH', type=str,
-                        default='../data/train_set.csv',
+                        default='../data/train_set_covid.csv',
                         help='Path of Training dataset (Default data/train_set.csv)',
                         dest='training_path')
-    parser.add_argument('-test', default='../data/test_set.csv',
+    parser.add_argument('-test', default='../data/test_set_covid.csv',
                         dest='test_path', help='Path of Test dataset (Default data/test_set.csv)')
     parser.add_argument('-models', type=str, default='../default_models.json',
                         help='Path to JSON file with models and their parameters to detect Fake News',
@@ -51,22 +51,21 @@ def fake_news_detection(command_line_args):
     """
         Perform Fake News detection using         
     """
-    train_data = pd.read_csv(command_line_args.training_path)[["text", "label"]]
-    test_data = pd.read_csv(command_line_args.test_path)[["text", "label"]]
+    train_data = pd.read_csv(command_line_args.training_path)[["tweet", "label"]]
+    test_data = pd.read_csv(command_line_args.test_path)[["tweet", "label"]]
     train_data["label"] = [label_value[label] for label in train_data["label"]]
     test_data["label"] = [label_value[label] for label in test_data["label"]]
     models = initialize_models(command_line_args.models)
-    models[0].fit(train_data["text"], train_data["label"])
+    models[0].fit(train_data["tweet"], train_data["label"])
     models[0].plot_loss()
     models[0].plot_accuracy()
-    print(models[0].evaluate_model(test_data["text"], test_data["label"]))
+    print(models[0].evaluate_model(test_data["tweet"], test_data["label"]))
 
 label_value = {
-    'FALSE': 0,
-    'partially false': 1,
-    'other': 2, 
-    'TRUE': 3,
+    'fake': 0,
+    'real': 1,
 }
+
 if __name__ =="__main__":
     args = command_line_arguments()
     fake_news_detection(args)

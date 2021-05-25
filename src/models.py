@@ -55,8 +55,7 @@ class BERT():
         net = outputs['pooled_output']
         net = tf.keras.layers.Dropout(prob_dropout)(net)
         net = tf.keras.layers.Dense(32, activation='relu')(net)
-        net = tf.keras.layers.Dense(4, activation='sigmoid')(net)
-        net = tf.keras.layers.Softmax(name='softmax_classifier')(net)
+        net = tf.keras.layers.Dense(1, activation='sigmoid')(net)
         return tf.keras.Model(text_input, net)
 
 
@@ -93,9 +92,8 @@ class BERT():
         Returns:
             tf.keras.callbacks.History: History of the training
         """
-        categorical_label = tf.keras.utils.to_categorical(training_label, num_classes=None)
         self.history = self.model.fit(training_text,
-                              categorical_label,
+                              training_label,
                               validation_split=self.validation_split,
                               epochs=self.epochs)
         return self.history
