@@ -8,7 +8,7 @@ import tensorflow_text
 from official.nlp import optimization  # to create AdamW optimizer
 import matplotlib.pyplot as plt
 
-TFHUB_HANDLE_BERT_ENCODER = "https://tfhub.dev/tensorflow/small_bert/bert_en_uncased_L-2_H-128_A-2/1"
+TFHUB_HANDLE_BERT_ENCODER = "https://tfhub.dev/tensorflow/small_bert/bert_en_uncased_L-2_H-256_A-2/1"
 TFHUB_HANDLE_BERT_PREPROCESS = "https://tfhub.dev/tensorflow/bert_en_uncased_preprocess/3"
 
 TFHUB_HANDLE_ALBERT_ENCODER = "https://tfhub.dev/tensorflow/albert_en_base/3"
@@ -24,8 +24,8 @@ class BERT():
     def __init__(self, params):
         self.model = self.build_model(params["prob_dropout"], params["preprocessing_hub"], 
                                       params["encoder_hub"])
-        self.loss = params["loss"]
-        self.metrics = params["metrics"]
+        self.loss = loss_function[params["loss"]]
+        self.metrics = metric_function[params["metrics"]]
         self.optimizer = self.build_optimizer(params["epochs_tuning"], params["initial_lr"],
                                               params["optimizer_type"])
         self.epochs = params["epochs"]
@@ -54,6 +54,8 @@ class BERT():
         outputs = encoder(encoder_inputs)
         net = outputs['pooled_output']
         net = tf.keras.layers.Dropout(prob_dropout)(net)
+        net = tf.keras.layers.Dense(32, activation='relu')(net)
+        net = tf.keras.layers.Dense(4, activation='sigmoid')(net)
         net = tf.keras.layers.Softmax(name='softmax_classifier')(net)
         return tf.keras.Model(text_input, net)
 
@@ -91,8 +93,9 @@ class BERT():
         Returns:
             tf.keras.callbacks.History: History of the training
         """
+        categorical_label = tf.keras.utils.to_categorical(training_label, num_classes=None)
         self.history = self.model.fit(training_text,
-                              training_label,
+                              categorical_label,
                               validation_split=self.validation_split,
                               epochs=self.epochs)
         return self.history
@@ -153,8 +156,8 @@ class BERT():
         """Method to plot the accuracy
         """
         history_dict = self.history.history 
-        acc = history_dict['binary_accuracy']
-        val_acc = history_dict['val_binary_accuracy']
+        acc = history_dict['accuracy']
+        val_acc = history_dict['val_accuracy']
         epochs = range(1, self.epochs + 1)
         
         plt.plot(epochs, acc, 'r', label='Training acc')
@@ -194,9 +197,11 @@ class FF(BERT):
 # Loss Dictionary        
 loss_function = {
     'binary_crossentropy': tf.keras.losses.BinaryCrossentropy(),
+    'sparse_categorical_crossentropy': tf.keras.losses.CategoricalCrossentropy(),
 }
 
 # Metric Dictionary
 metric_function = {
-    'binary_accuracy': tf.metrics.BinaryAccuracy(),
+    'binary_accuracy': tf.metrics.BinaryAccuracy(name='accuracy'),
+    'accuracy': tf.metrics.CategoricalAccuracy(name='accuracy'),
 }
