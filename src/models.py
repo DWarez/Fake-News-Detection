@@ -203,7 +203,7 @@ class TuningBert(HyperModel):
         text_input = tf.keras.layers.Input(shape=(), dtype=tf.string, name='text')
         preprocessing_layer = hub.KerasLayer(hp.Fixed('preprocessing', self.params["preprocessing"]), name='preprocessing')
         encoder_inputs = preprocessing_layer(text_input)
-        encoder = hub.KerasLayer(hp.Choice('encoder', self.params["encoder"]["values"]), name='BERT_encoder')
+        encoder = hub.KerasLayer(hp.Choice('encoder', self.params["encoder"]), name='BERT_encoder')
         outputs = encoder(encoder_inputs)
         net = outputs['pooled_output']
 
@@ -218,7 +218,7 @@ class TuningBert(HyperModel):
         model = tf.keras.Model(text_input, net)
         model.compile(optimizer=tf.keras.optimizers.Adam(
             hp.Choice('learning_rate',
-                      self.params["learning_rate"]["values"])),
+                      self.params["learning_rate"])),
         loss=loss_function[self.params["loss"]],
         metrics=metric_function[self.params["metrics"]])
         return model   
