@@ -4,6 +4,7 @@
 
 import tensorflow as tf
 import tensorflow_hub as hub
+import tensorflow_addons as tfa
 import tensorflow_text 
 from official.nlp import optimization  # to create AdamW optimizer
 import matplotlib.pyplot as plt
@@ -29,7 +30,6 @@ class BERT():
         self.optimizer = self.build_optimizer(params["epochs_tuning"], params["initial_lr"],
                                               params["optimizer_type"])
         self.epochs = params["epochs"]
-        self.validation_split = params["validation_split"]
         self.model.compile(optimizer=self.optimizer,
                            loss=self.loss,
                            metrics=self.metrics)
@@ -82,7 +82,8 @@ class BERT():
                                              optimizer_type=optimizer)
 
 
-    def fit(self, training_text, training_label):
+    def fit(self, training_text, training_label,
+                  validation_data):
         """Method for fitting the model
 
         Args:
@@ -94,7 +95,7 @@ class BERT():
         """
         self.history = self.model.fit(training_text,
                               training_label,
-                              validation_split=self.validation_split,
+                              validation_data=validation_data,
                               epochs=self.epochs)
         return self.history
 
@@ -200,6 +201,9 @@ loss_function = {
 
 # Metric Dictionary
 metric_function = {
+    'precision': tf.metrics.Precision(),
+    'recall': tf.metrics.Recall(),
+    'f1': tfa.metrics.F1Score(),
     'binary_accuracy': tf.metrics.BinaryAccuracy(name='accuracy'),
     'accuracy': tf.metrics.CategoricalAccuracy(name='accuracy'),
 }

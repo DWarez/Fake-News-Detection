@@ -8,7 +8,6 @@
         "prob_dropout": 0.25,
         "encoder_hub": "https://tfhub.dev/tensorflow/small_bert/bert_en_uncased_L-2_H-128_A-2/1",
         "preprocessing_hub": "https://tfhub.dev/tensorflow/bert_en_uncased_preprocess/3",
-        "validation_split": 0.25,
         "optimizer_type": "adamw"
     },
 
