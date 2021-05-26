@@ -9,7 +9,6 @@ import tensorflow_addons as tfa
 import tensorflow_text 
 from kerastuner import HyperModel
 from kerastuner.tuners import RandomSearch
-from official.nlp import optimization  # to create AdamW optimizer
 import matplotlib.pyplot as plt
 
 TFHUB_HANDLE_BERT_ENCODER = "https://tfhub.dev/tensorflow/small_bert/bert_en_uncased_L-2_H-256_A-2/1"
@@ -31,7 +30,7 @@ class BERT():
         self.loss = loss_function[params["loss"]]
         self.metrics = metric_function[params["metrics"]]
         self.optimizer = self.build_optimizer(params["epochs_tuning"], params["initial_lr"],
-                                              params["optimizer_type"])
+                                              optimizer[params["optimizer_type"]])
         self.epochs = params["epochs"]
         self.model.compile(optimizer=self.optimizer,
                            loss=self.loss,
@@ -78,10 +77,7 @@ class BERT():
         num_warmup_steps = int(0.1*num_train_steps)
 
         init_lr = initial_learning_rate
-        return optimization.create_optimizer(init_lr=init_lr,
-                                             num_train_steps=num_train_steps,
-                                             num_warmup_steps=num_warmup_steps,
-                                             optimizer_type=optimizer)
+        return optimizer(initial_learning_rate)
 
 
     def fit(self, training_text, training_label,
@@ -247,4 +243,8 @@ metric_function = {
     'recall': tf.metrics.Recall(),
     'binary_accuracy': tf.metrics.BinaryAccuracy(name='accuracy'),
     'accuracy': tf.metrics.CategoricalAccuracy(name='accuracy'),
+}
+
+optimizer = {
+    'adam': tf.keras.optimizers.Adam(name='Adam')
 }

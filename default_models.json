@@ -8,7 +8,7 @@
         "prob_dropout": 0.25,
         "encoder_hub": "https://tfhub.dev/tensorflow/small_bert/bert_en_uncased_L-2_H-128_A-2/1",
         "preprocessing_hub": "https://tfhub.dev/tensorflow/bert_en_uncased_preprocess/3",
-        "optimizer_type": "adamw"
+        "optimizer_type": "adam"
     },
 
     "ALBERT" : {
@@ -21,7 +21,7 @@
         "encoder_hub": "https://tfhub.dev/tensorflow/albert_en_base/3",
         "preprocessing_hub": "http://tfhub.dev/tensorflow/albert_en_preprocess/3",
         "validation_split": 0.25,
-        "optimizer_type": "adamw"
+        "optimizer_type": "adam"
     },
 
     "ELECTRA" : {
@@ -34,7 +34,7 @@
         "encoder_hub": "https://tfhub.dev/google/electra_small/2",
         "preprocessing_hub": "https://tfhub.dev/tensorflow/bert_en_uncased_preprocess/3",
         "validation_split": 0.25,
-        "optimizer_type": "adamw"
+        "optimizer_type": "adam"
     }, 
 
     "USEC" : {
@@ -47,7 +47,7 @@
         "encoder_hub": "https://tfhub.dev/google/universal-sentence-encoder-cmlm/en-base/1",
         "preprocessing_hub": "https://tfhub.dev/tensorflow/bert_en_uncased_preprocess/3",
         "validation_split": 0.25,
-        "optimizer_type": "adamw"
+        "optimizer_type": "adam"
     },
 
     "NNLM" : {
@@ -59,6 +59,6 @@
         "prob_dropout": 0.15,
         "encoder_hub": "https://tfhub.dev/google/tf2-preview/nnlm-en-dim50/1",
         "validation_split": 0.25,
-        "optimizer_type": "adamw"
+        "optimizer_type": "adam"
     }
 }
