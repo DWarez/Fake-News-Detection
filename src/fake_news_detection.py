@@ -75,6 +75,7 @@ def fake_news_detection(command_line_args):
         data = json.load(models_file)
         perform_grid_tuning(data, train_data["tweet"], train_data["label"],
                         (validation_data["tweet"], validation_data["label"]))
+
 label_value = {
     'fake': 0,
     'real': 1,

@@ -229,11 +229,12 @@ def perform_grid_tuning(params, train_data, train_label, validation_data):
         objective='val_accuracy',
         max_trials=5,
         executions_per_trial=3,
-        directory='my_dir',
-        project_name='helloworld')
+        directory='model_selection',
+        project_name='fake_news_detection')
     tuner.search(train_data, train_label,
                  epochs=5,
                  validation_data=validation_data)
+
 # Loss Dictionary        
 loss_function = {
     'binary_crossentropy': tf.keras.losses.BinaryCrossentropy(),
