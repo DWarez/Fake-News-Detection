@@ -7,6 +7,11 @@ import pandas as pd
 
 from models import BERT, FF, loss_function, metric_function, perform_grid_tuning
 
+import tensorflow as tf
+
+# To use GPU
+sess = tf.compat.v1.Session(
+    config=tf.compat.v1.ConfigProto(log_device_placement=True))
 
 def command_line_arguments():
     """

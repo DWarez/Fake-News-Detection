@@ -2,7 +2,7 @@
     "loss": "binary_crossentropy",
     "metrics": "binary_accuracy",
     "epochs": 20,
-    "max_trials": 300,
+    "max_trials": 5,
     "execution_per_trial": 3,
     "objective":"val_accuracy",
     "patience":3, 

@@ -4,12 +4,14 @@
 
 import tensorflow as tf
 from tensorflow import keras
+from tensorflow.keras import callbacks
 import tensorflow_hub as hub
 import tensorflow_addons as tfa
 import tensorflow_text 
 from kerastuner import HyperModel
 from kerastuner.tuners import RandomSearch
 import matplotlib.pyplot as plt
+
 
 TFHUB_HANDLE_BERT_ENCODER = "https://tfhub.dev/tensorflow/small_bert/bert_en_uncased_L-2_H-256_A-2/1"
 TFHUB_HANDLE_BERT_PREPROCESS = "https://tfhub.dev/tensorflow/bert_en_uncased_preprocess/3"
@@ -220,16 +222,21 @@ class TuningBert(HyperModel):
         return model   
 
 def perform_grid_tuning(params, train_data, train_label, validation_data):
+
+    early_stopping = tf.keras.callbacks.EarlyStopping(
+        monitor='val_accuracy', patience=params["patience"], restore_best_weights=True)
+
     tuner = RandomSearch(
         TuningBert(params),
         objective='val_accuracy',
-        max_trials=5,
-        executions_per_trial=3,
+        max_trials=params["max_trials"],
+        executions_per_trial=params["execution_per_trial"],
         directory='model_selection',
         project_name='fake_news_detection')
     tuner.search(train_data, train_label,
-                 epochs=5,
-                 validation_data=validation_data)
+                 epochs=params["epochs"],
+                 validation_data=validation_data,
+                 callbacks=[early_stopping])
 
 # Loss Dictionary        
 loss_function = {
