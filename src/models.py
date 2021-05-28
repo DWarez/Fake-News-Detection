@@ -237,6 +237,7 @@ def perform_grid_tuning(params, train_data, train_label, validation_data):
                  epochs=params["epochs"],
                  validation_data=validation_data,
                  callbacks=[early_stopping])
+    tuner.results_summary()
 
 # Loss Dictionary        
 loss_function = {
