@@ -1,64 +1,127 @@
 {
-    "BERT" : {
+    "model_1" : {
+        "loss": "binary_crossentropy",
+       	"metrics": "binary_accuracy",
+        "epochs": 30,
+        "epochs_tuning": 50,
+        "initial_lr": 3e-4,
+        "prob_dropout": 0.1,
+	"dense_unit": 64,
+        "encoder_hub": "https://tfhub.dev/tensorflow/small_bert/bert_en_uncased_L-2_H-128_A-2/2",
+        "preprocessing_hub": "https://tfhub.dev/tensorflow/bert_en_uncased_preprocess/3",
+        "optimizer_type": "adam"
+    },
+    
+    "model_2":  {
         "loss": "binary_crossentropy",
         "metrics": "binary_accuracy",
-        "epochs": 10,
+        "epochs": 30,
+        "epochs_tuning": 50,
+        "initial_lr": 5e-4,
+        "prob_dropout": 0.2,
+	"dense_unit": 16,
+        "encoder_hub": "https://tfhub.dev/tensorflow/small_bert/bert_en_uncased_L-2_H-128_A-2/2",
+        "preprocessing_hub": "https://tfhub.dev/tensorflow/bert_en_uncased_preprocess/3",
+        "optimizer_type": "adam"
+
+    },
+    "model_3": {
+        "loss": "binary_crossentropy",
+        "metrics": "binary_accuracy",
+        "epochs": 30,
         "epochs_tuning": 50,
         "initial_lr": 3e-4,
         "prob_dropout": 0.25,
-        "encoder_hub": "https://tfhub.dev/tensorflow/small_bert/bert_en_uncased_L-2_H-128_A-2/1",
+	"dense_unit": 32,
+        "encoder_hub": "https://tfhub.dev/tensorflow/bert_en_uncased_L-12_H-768_A-12/4",
         "preprocessing_hub": "https://tfhub.dev/tensorflow/bert_en_uncased_preprocess/3",
         "optimizer_type": "adam"
     },
 
-    "ALBERT" : {
+    "model_4": {
         "loss": "binary_crossentropy",
         "metrics": "binary_accuracy",
-        "epochs": 20,
+        "epochs": 30,
         "epochs_tuning": 50,
-        "initial_lr": 3e-5,
-        "prob_dropout": 0.15,
-        "encoder_hub": "https://tfhub.dev/tensorflow/albert_en_base/3",
-        "preprocessing_hub": "http://tfhub.dev/tensorflow/albert_en_preprocess/3",
-        "validation_split": 0.25,
+        "initial_lr": 4e-4,
+        "prob_dropout": 0.25,
+	"dense_unit": 16,
+        "encoder_hub": "https://tfhub.dev/tensorflow/small_bert/bert_en_uncased_L-2_H-128_A-2/2",
+        "preprocessing_hub": "https://tfhub.dev/tensorflow/bert_en_uncased_preprocess/3",
         "optimizer_type": "adam"
     },
 
-    "ELECTRA" : {
+    "model_5": {
         "loss": "binary_crossentropy",
         "metrics": "binary_accuracy",
-        "epochs": 20,
+        "epochs": 30,
         "epochs_tuning": 50,
-        "initial_lr": 3e-5,
+        "initial_lr": 2e-4,
         "prob_dropout": 0.15,
-        "encoder_hub": "https://tfhub.dev/google/electra_small/2",
+	"dense_unit": 24,
+        "encoder_hub": "https://tfhub.dev/tensorflow/small_bert/bert_en_uncased_L-2_H-128_A-2/2",
         "preprocessing_hub": "https://tfhub.dev/tensorflow/bert_en_uncased_preprocess/3",
-        "validation_split": 0.25,
-        "optimizer_type": "adam"
-    }, 
-
-    "USEC" : {
-        "loss": "binary_crossentropy",
-        "metrics": "binary_accuracy",
-        "epochs": 20,
-        "epochs_tuning": 5,
-        "initial_lr": 3e-5,
-        "prob_dropout": 0.15,
-        "encoder_hub": "https://tfhub.dev/google/universal-sentence-encoder-cmlm/en-base/1",
-        "preprocessing_hub": "https://tfhub.dev/tensorflow/bert_en_uncased_preprocess/3",
-        "validation_split": 0.25,
         "optimizer_type": "adam"
     },
 
-    "NNLM" : {
+    "model_6": {
         "loss": "binary_crossentropy",
         "metrics": "binary_accuracy",
-        "epochs": 20,
-        "epochs_tuning": 5,
-        "initial_lr": 3e-5,
+        "epochs": 30,
+        "epochs_tuning": 50,
+        "initial_lr": 2e-4,
         "prob_dropout": 0.15,
-        "encoder_hub": "https://tfhub.dev/google/tf2-preview/nnlm-en-dim50/1",
-        "validation_split": 0.25,
+	"dense_unit": 32,
+        "encoder_hub": "https://tfhub.dev/tensorflow/small_bert/bert_en_uncased_L-2_H-128_A-2/2",
+        "preprocessing_hub": "https://tfhub.dev/tensorflow/bert_en_uncased_preprocess/3",
+        "optimizer_type": "adam"
+    },
+    "model_7": {
+        "loss": "binary_crossentropy",
+        "metrics": "binary_accuracy",
+        "epochs": 30,
+        "epochs_tuning": 50,
+        "initial_lr": 3e-4,
+        "prob_dropout": 0.10,
+	"dense_unit": 8,
+        "encoder_hub": "https://tfhub.dev/tensorflow/small_bert/bert_en_uncased_L-2_H-128_A-2/2",
+        "preprocessing_hub": "https://tfhub.dev/tensorflow/bert_en_uncased_preprocess/3",
+        "optimizer_type": "adam"
+    },
+    "model_8": {
+        "loss": "binary_crossentropy",
+        "metrics": "binary_accuracy",
+        "epochs": 30,
+        "epochs_tuning": 50,
+        "initial_lr": 5e-4,
+        "prob_dropout": 0.15,
+	"dense_unit": 96,
+        "encoder_hub": "https://tfhub.dev/tensorflow/small_bert/bert_en_uncased_L-2_H-128_A-2/2",
+        "preprocessing_hub": "https://tfhub.dev/tensorflow/bert_en_uncased_preprocess/3",
+        "optimizer_type": "adam"
+    },
+    "model_9": {
+        "loss": "binary_crossentropy",
+        "metrics": "binary_accuracy",
+        "epochs": 30,
+        "epochs_tuning": 50,
+        "initial_lr": 4e-4,
+        "prob_dropout": 0.2,
+	"dense_unit": 64,
+        "encoder_hub": "https://tfhub.dev/tensorflow/small_bert/bert_en_uncased_L-2_H-128_A-2/2",
+        "preprocessing_hub": "https://tfhub.dev/tensorflow/bert_en_uncased_preprocess/3",
+        "optimizer_type": "adam"
+    },
+    "model_10": {
+        "loss": "binary_crossentropy",
+        "metrics": "binary_accuracy",
+        "epochs": 30,
+        "epochs_tuning": 50,
+        "initial_lr": 3e-4,
+        "prob_dropout": 0.15,
+	"dense_unit": 28,
+        "encoder_hub": "https://tfhub.dev/tensorflow/small_bert/bert_en_uncased_L-2_H-128_A-2/2",
+        "preprocessing_hub": "https://tfhub.dev/tensorflow/bert_en_uncased_preprocess/3",
         "optimizer_type": "adam"
     }
 }

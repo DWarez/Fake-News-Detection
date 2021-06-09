@@ -28,18 +28,20 @@ class BERT():
     """
     def __init__(self, params):
         self.model = self.build_model(params["prob_dropout"], params["preprocessing_hub"], 
-                                      params["encoder_hub"])
+                                      params["encoder_hub"], params["dense_unit"])
         self.loss = loss_function[params["loss"]]
         self.metrics = metric_function[params["metrics"]]
         self.optimizer = self.build_optimizer(params["epochs_tuning"], params["initial_lr"],
-                                              optimizer[params["optimizer_type"]])
+                                              optimizer[params["optimizer_type"]],
+                                              )
         self.epochs = params["epochs"]
         self.model.compile(optimizer=self.optimizer,
                            loss=self.loss,
                            metrics=self.metrics)
+        self.model.summary()
         self.history = []
 
-    def build_model(self, prob_dropout, bert_preprocess, bert_encoder):
+    def build_model(self, prob_dropout, bert_preprocess, bert_encoder, dense_unit):
         """Method for creating the model.
 
         Args:
@@ -57,7 +59,7 @@ class BERT():
         outputs = encoder(encoder_inputs)
         net = outputs['pooled_output']
         net = tf.keras.layers.Dropout(prob_dropout)(net)
-        net = tf.keras.layers.Dense(32, activation='relu')(net)
+        net = tf.keras.layers.Dense(dense_unit, activation='relu')(net)
         net = tf.keras.layers.Dense(1, activation='sigmoid')(net)
         return tf.keras.Model(text_input, net)
 
@@ -73,13 +75,13 @@ class BERT():
         Returns:
             tf.keras.optimizer: Optimizer of the BERT-based model
         """
-        epochs = epochs_tuning
+        #epochs = epochs_tuning
         #steps_per_epoch = tf.data.experimental.cardinality(train_ds).numpy()
-        num_train_steps = 10 * epochs
-        num_warmup_steps = int(0.1*num_train_steps)
+        #num_train_steps = 10 * epochs
+        #num_warmup_steps = int(0.1*num_train_steps)
 
         init_lr = initial_learning_rate
-        return optimizer(initial_learning_rate)
+        return tf.keras.optimizers.Adam(initial_learning_rate)
 
 
     def fit(self, training_text, training_label,
@@ -93,10 +95,13 @@ class BERT():
         Returns:
             tf.keras.callbacks.History: History of the training
         """
+        early_stopping = tf.keras.callbacks.EarlyStopping(
+            monitor='val_accuracy', patience=5, restore_best_weights=True)
         self.history = self.model.fit(training_text,
                               training_label,
                               validation_data=validation_data,
-                              epochs=self.epochs)
+                              epochs=self.epochs,
+                              callbacks=[early_stopping])
         return self.history
 
 
@@ -208,17 +213,26 @@ class TuningBert(HyperModel):
         net = tf.keras.layers.Dropout(hp.Float('dropout', self.params["dropout"]["min_value"],
                                            self.params["dropout"]["max_value"],
                                            self.params["dropout"]["step"]))(net)
-        net = tf.keras.layers.Dense(32, activation='relu')(net)
+        #net = tf.keras.layers.Dense(32, activation='relu')(net)
         dense_unit = self.params["dense_units"]
         net = tf.keras.layers.Dense(hp.Int('dense_unit', dense_unit["min_value"],
-                                       dense_unit["max_value"], dense_unit["step"]))(net)
+                                           dense_unit["max_value"], dense_unit["step"]))(net)
         net = tf.keras.layers.Dense(1, activation='sigmoid')(net)
         model = tf.keras.Model(text_input, net)
+        
+        #epochs = self.params["epochs_tuning"]
+        #steps_per_epoch = tf.data.experimental.cardinality(train_ds).numpy()
+        #num_train_steps = 10 * epochs
+        #num_warmup_steps = int(0.1*num_train_steps)
+
+        #init_lr = initial_learning_rate
+        #optimizer = tf.keras.optimizers.Adam(initial_learning_rate)
         model.compile(optimizer=tf.keras.optimizers.Adam(
             hp.Choice('learning_rate',
                       self.params["learning_rate"])),
         loss=loss_function[self.params["loss"]],
         metrics=metric_function[self.params["metrics"]])
+        model.summary()
         return model   
 
 def perform_grid_tuning(params, train_data, train_label, validation_data):
@@ -238,6 +252,15 @@ def perform_grid_tuning(params, train_data, train_label, validation_data):
                  validation_data=validation_data,
                  callbacks=[early_stopping])
     tuner.results_summary()
+
+def ensembling_models(models):
+    inputs = tf.keras.layers.Input(shape=(), dtype=tf.string, name='text')
+    combined = tf.keras.layers.Average()([model(inputs) for model in models])
+    model = tf.keras.models.Model(inputs, combined)
+    model.compile(optimizer=tf.keras.optimizers.Adam(name='Adam'),
+                  loss=loss_function['binary_crossentropy'],
+                  metrics=metric_function['binary_accuracy'])
+    return model
 
 # Loss Dictionary        
 loss_function = {

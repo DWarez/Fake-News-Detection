@@ -5,9 +5,12 @@ import argparse
 import json
 import pandas as pd
 
-from models import BERT, FF, loss_function, metric_function, perform_grid_tuning
+from models import BERT, FF, loss_function, metric_function, perform_grid_tuning, ensembling_models
 
 import tensorflow as tf
+#physical_devices = tf.config.list_physical_devices('GPU')
+
+#tf.config.experimental.set_memory_growth(physical_devices[0], True)
 
 # To use GPU
 sess = tf.compat.v1.Session(
@@ -37,7 +40,7 @@ def command_line_arguments():
     parser.add_argument('-models', type=str, default='../default_models.json',
                         help='Path to JSON file with models and their parameters to detect Fake News',
                         dest='models')
-    parser.add_argument('-grid_search_models', type=str, default='../hyperparameters.json',
+    parser.add_argument('-grid_search_models', type=str, default='../my_hyperparameters.json',
                         help='Path to JSON file with Grid Search choices for model tuning',
                         dest='grid_search')
     return parser.parse_args()
@@ -55,8 +58,30 @@ def initialize_models(models_config):
         data = json.load(models_file)
         #if data["NNLM"]:
         #    models.append(FF(data["NNLM"]))
-        if data["BERT"]:
-            models.append(BERT(data["BERT"]))
+        
+        if data["model_1"]:
+            models.append(BERT(data["model_1"]))
+        if data["model_2"]:
+            models.append(BERT(data["model_2"]))
+        
+        if data["model_3"]:
+            models.append(BERT(data["model_3"]))
+        
+        if data["model_4"]:
+            models.append(BERT(data["model_4"]))
+        if data["model_5"]:
+            models.append(BERT(data["model_5"]))
+        if data["model_6"]:
+            models.append(BERT(data["model_6"]))
+        if data["model_7"]:
+            models.append(BERT(data["model_7"]))
+        if data["model_8"]:
+            models.append(BERT(data["model_8"]))
+        if data["model_9"]:
+            models.append(BERT(data["model_9"]))
+        if data["model_10"]:
+            models.append(BERT(data["model_10"]))
+        
     return models
 
 
@@ -70,16 +95,26 @@ def fake_news_detection(command_line_args):
     train_data["label"] = [label_value[label] for label in train_data["label"]]
     validation_data["label"] = [label_value[label] for label in validation_data["label"]]
     test_data["label"] = [label_value[label] for label in test_data["label"]]
-    #models = initialize_models(command_line_args.models)
-    #models[0].fit(train_data["tweet"], train_data["label"],
-    #              (validation_data["tweet"], validation_data["label"]))
+    train_data = train_data.append(validation_data)
+    models = initialize_models(command_line_args.models)
+    for index, model in enumerate(models):
+        model.fit(train_data["tweet"], train_data["label"],
+                  (test_data["tweet"], test_data["label"]))
+        model.model.save('model_' + str(index))
     #models[0].plot_loss()
     #models[0].plot_accuracy()
     #print(models[0].evaluate_model(test_data["tweet"], test_data["label"]))
-    with open(command_line_args.grid_search) as models_file:
-        data = json.load(models_file)
-        perform_grid_tuning(data, train_data["tweet"], train_data["label"],
-                        (validation_data["tweet"], validation_data["label"]))
+    #models_trained = [model.model for model in models]
+    #print(len(models_trained))
+    #ensembling_model = ensembling_models(models_trained)
+    #early_stopping = tf.keras.callbacks.EarlyStopping(
+    #        monitor='val_accuracy', patience=5, restore_best_weights=True)
+    #ensembling_model.evaluate(validation_data["tweet"], validation_data["label"])
+    #ensembling_model.save('ensembling')
+    #with open(command_line_args.grid_search) as models_file:
+    #    data = json.load(models_file)
+    #    perform_grid_tuning(data, train_data["tweet"], train_data["label"],
+    #                        (validation_data["tweet"], validation_data["label"]))
 
 label_value = {
     'fake': 0,
